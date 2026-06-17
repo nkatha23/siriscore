@@ -1,0 +1,2 @@
+[console_scripts]
+btc-privacy-check = cli:main
