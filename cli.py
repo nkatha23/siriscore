@@ -58,7 +58,7 @@ def main():
         if args.json_output:
             print(json.dumps({"error": str(exc)}, indent=2))
         else:
-            console.print(f"[red]Error:[/red] {exc}", file=sys.stderr)
+            err_console.print(f"[red]Error:[/red] {exc}")
         sys.exit(2)
 
     if args.json_output:
