@@ -80,10 +80,11 @@ def _build_checks(tx, findings: list[Finding], lookup: bool) -> list[Check]:
             continue
 
         if heuristic_id in _NETWORK_IDS and not lookup:
-            checks.append(Check(
-                heuristic_id, severity, title,
-                "skipped", "Pass lookup=True to enable network checks"
-            ))
+            reason = _unavailable_reason(heuristic_id, tx)
+            if reason:
+                checks.append(Check(heuristic_id, severity, title, "unavailable", reason))
+            else:
+                checks.append(Check(heuristic_id, severity, title, "skipped", "Pass lookup=True to enable network checks"))
             continue
 
         reason = _unavailable_reason(heuristic_id, tx)
@@ -104,6 +105,9 @@ def _unavailable_reason(heuristic_id: str, tx) -> str:
 
     if heuristic_id == "H3" and not any(getattr(i, "address", None) for i in tx.inputs):
         return "Input addresses unavailable"
+
+    if heuristic_id == "H4" and not any(getattr(i, "script_pubkey", None) for i in tx.inputs):
+        return "Input prevout data unavailable"
 
     if heuristic_id == "H6" and not any(getattr(i, "value", None) is not None for i in tx.inputs):
         return "Input values unavailable"
