@@ -7,550 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --bg:             #F9F7F4;
-      --surface:        #FFFFFF;
-      --border:         #E2E8F0;
-      --text-primary:   #0F172A;
-      --text-secondary: #475569;
-      --text-muted:     #94A3B8;
-
-      --orange:         #EA580C;
-      --orange-light:   #FFF7ED;
-      --orange-dark:    #C2410C;
-
-      --green:          #16A34A;
-      --green-light:    #DCFCE7;
-
-      --red:            #DC2626;
-      --red-light:      #FEF2F2;
-
-      --amber:          #D97706;
-      --amber-light:    #FFFBEB;
-
-      --slate:          #475569;
-      --slate-light:    #F8FAFC;
-    }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--text-primary);
-      padding-top: 56px;
-    }
-
-    .mono { font-family: 'JetBrains Mono', monospace; }
-
-    /* ── Header ─────────────────────────────────────────────── */
-    header {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      height: 56px;
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 24px;
-      z-index: 100;
-    }
-
-    .wordmark {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      text-decoration: none;
-    }
-
-    .wordmark-icon {
-      width: 28px; height: 28px;
-      background: var(--orange);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .wordmark-icon svg { width: 14px; height: 14px; }
-
-    .wordmark-text {
-      font-size: 20px;
-      font-weight: 600;
-      line-height: 1;
-    }
-
-    .wordmark-text .siri { color: var(--orange); }
-    .wordmark-text .score-part { color: var(--text-primary); }
-
-    .nav-links { display: flex; gap: 20px; }
-
-    .nav-links a {
-      font-size: 14px;
-      font-weight: 400;
-      color: var(--text-secondary);
-      text-decoration: none;
-      transition: color 150ms;
-    }
-
-    .nav-links a:hover { color: var(--orange); }
-
-    /* ── Page wrapper ───────────────────────────────────────── */
-    .page { max-width: 780px; margin: 0 auto; padding: 0 24px 64px; }
-
-    /* ── Input zone ─────────────────────────────────────────── */
-    .input-zone { padding: 48px 0 32px; }
-
-    .input-zone h1 { font-size: 20px; font-weight: 600; color: var(--text-primary); }
-
-    .input-zone .subtitle {
-      font-size: 14px;
-      font-weight: 400;
-      color: var(--text-muted);
-      margin-top: 4px;
-    }
-
-    /* Pill tabs */
-    .pill-tabs { display: flex; gap: 8px; margin-top: 20px; }
-
-    .pill {
-      padding: 6px 16px;
-      border-radius: 20px;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--text-secondary);
-      transition: background 150ms, color 150ms, border-color 150ms;
-    }
-
-    .pill.active {
-      background: var(--orange);
-      color: #fff;
-      border-color: var(--orange);
-    }
-
-    /* Textarea */
-    textarea {
-      margin-top: 12px;
-      width: 100%;
-      height: 120px;
-      resize: vertical;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px;
-      background: var(--surface);
-      color: var(--text-primary);
-      outline: none;
-      transition: border-color 150ms;
-      display: block;
-    }
-
-    textarea::placeholder { color: var(--text-muted); }
-    textarea:focus { border-color: var(--orange); }
-
-    /* Analyse button */
-    .btn-analyse {
-      margin-top: 12px;
-      width: 100%;
-      height: 48px;
-      background: var(--orange);
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 150ms, transform 80ms, opacity 150ms;
-    }
-
-    .btn-analyse:hover { background: var(--orange-dark); }
-    .btn-analyse:active { transform: scale(0.98); }
-    .btn-analyse:disabled { opacity: 0.8; cursor: not-allowed; }
-
-    /* Import labels link */
-    .import-labels {
-      margin-top: 16px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--orange);
-      cursor: pointer;
-      background: none;
-      border: none;
-      padding: 0;
-    }
-
-    .import-labels:hover { color: var(--orange-dark); }
-    #file-input { display: none; }
-
-    /* Error banner */
-    .error-banner {
-      display: none;
-      margin-top: 12px;
-      padding: 12px 16px;
-      background: var(--red-light);
-      border-left: 3px solid var(--red);
-      border-radius: 8px;
-      font-size: 13px;
-      color: var(--red);
-    }
-
-    /* ── Results zone ───────────────────────────────────────── */
-    .results-zone {
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 200ms;
-    }
-
-    .results-zone.visible {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    /* Score card */
-    .score-card {
-      background: var(--surface);
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      padding: 32px;
-      display: flex;
-      gap: 32px;
-    }
-
-    .score-left { width: 180px; flex-shrink: 0; }
-
-    .score-number {
-      font-size: 64px;
-      font-weight: 600;
-      line-height: 1;
-    }
-
-    .score-label {
-      font-size: 12px;
-      font-weight: 400;
-      color: var(--text-muted);
-      margin-top: 4px;
-    }
-
-    .verdict-pill {
-      display: inline-block;
-      margin-top: 8px;
-      border-radius: 12px;
-      padding: 2px 10px;
-      font-size: 13px;
-      font-weight: 500;
-    }
-
-    .verdict-good  { background: var(--green-light);  color: var(--green); }
-    .verdict-fair  { background: var(--amber-light);  color: var(--amber); }
-    .verdict-poor  { background: var(--red-light);    color: var(--red); }
-
-    .score-right { flex: 1; min-width: 0; }
-
-    /* Gauge */
-    .gauge-wrap { position: relative; }
-
-    .gauge-bar {
-      display: flex;
-      height: 8px;
-      border-radius: 4px;
-      overflow: visible;
-    }
-
-    .gauge-seg-red   { width: 39%; background: var(--red);   border-radius: 4px 0 0 4px; }
-    .gauge-seg-amber { width: 30%; background: var(--amber); }
-    .gauge-seg-green { width: 31%; background: var(--green); border-radius: 0 4px 4px 0; }
-
-    .gauge-dot {
-      position: absolute;
-      top: 50%;
-      width: 12px; height: 12px;
-      border-radius: 50%;
-      background: #fff;
-      border-width: 2px;
-      border-style: solid;
-      transform: translate(-50%, -50%);
-      transition: left 400ms ease;
-    }
-
-    /* Metadata chips */
-    .meta-chips {
-      display: flex;
-      gap: 8px;
-      margin-top: 16px;
-      flex-wrap: wrap;
-    }
-
-    .chip {
-      background: var(--slate-light);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 3px 10px;
-      font-size: 12px;
-      font-weight: 400;
-      color: var(--text-secondary);
-    }
-
-    /* ── Section headings ───────────────────────────────────── */
-    .section-head {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-
-    .section-head h2 { font-size: 20px; font-weight: 600; color: var(--text-primary); }
-
-    .count-badge {
-      background: var(--orange);
-      color: #fff;
-      font-size: 12px;
-      font-weight: 500;
-      border-radius: 12px;
-      padding: 2px 10px;
-    }
-
-    /* ── Finding cards ──────────────────────────────────────── */
-    .findings-section { margin-top: 32px; }
-
-    .finding-card {
-      background: var(--surface);
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      padding: 16px 20px;
-      margin-bottom: 8px;
-      border-left-width: 3px;
-      border-left-style: solid;
-    }
-
-    .finding-card.critical { border-left-color: var(--red); }
-    .finding-card.warning  { border-left-color: var(--amber); }
-    .finding-card.info     { border-left-color: var(--slate); }
-
-    .no-findings {
-      background: var(--green-light);
-      border: 1px solid #86EFAC;
-      border-left: 3px solid var(--green);
-      border-radius: 8px;
-      padding: 16px 20px;
-      color: var(--green);
-      font-size: 14px;
-      font-weight: 500;
-    }
-
-    .finding-row1 {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .severity-badge {
-      border-radius: 10px;
-      padding: 2px 8px;
-      font-size: 11px;
-      font-weight: 500;
-    }
-
-    .severity-badge.critical { background: var(--red-light);   color: var(--red); }
-    .severity-badge.warning  { background: var(--amber-light); color: var(--amber); }
-    .severity-badge.info     { background: var(--slate-light); color: var(--slate); border: 1px solid var(--border); }
-
-    .heuristic-id {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    .finding-title {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-top: 8px;
-    }
-
-    .finding-detail {
-      font-size: 14px;
-      font-weight: 400;
-      color: var(--text-secondary);
-      margin-top: 4px;
-      line-height: 1.6;
-    }
-
-    .finding-suggestion {
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--orange);
-      margin-top: 8px;
-    }
-
-    /* ── Checks ─────────────────────────────────────────────── */
-    .checks-section { margin-top: 32px; }
-
-    .check-list {
-      display: grid;
-      gap: 6px;
-    }
-
-    .check-row {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-left: 3px solid var(--border);
-      border-radius: 8px;
-      padding: 12px 16px;
-      display: grid;
-      grid-template-columns: auto 1fr auto;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .check-row.fail { border-left-color: var(--red); }
-    .check-row.pass { border-left-color: var(--green); }
-    .check-row.unavailable { border-left-color: var(--amber); }
-
-    .check-id {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
-    .check-title {
-      min-width: 0;
-    }
-
-    .check-name {
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-primary);
-    }
-
-    .check-reason {
-      font-size: 12px;
-      font-weight: 400;
-      color: var(--text-secondary);
-      margin-top: 2px;
-    }
-
-    .check-status {
-      border-radius: 10px;
-      padding: 2px 8px;
-      font-size: 11px;
-      font-weight: 500;
-      text-transform: uppercase;
-    }
-
-    .check-status.fail { background: var(--red-light); color: var(--red); }
-    .check-status.pass { background: var(--green-light); color: var(--green); }
-    .check-status.unavailable { background: var(--amber-light); color: var(--amber); }
-
-    /* ── Coin labels ────────────────────────────────────────── */
-    .labels-section { margin-top: 32px; }
-
-    .label-row {
-      background: var(--surface);
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      padding: 12px 16px;
-      margin-bottom: 6px;
-    }
-
-    .label-row.tainted-active { background: var(--orange-light); }
-
-    .label-row-inner {
-      display: flex;
-      align-items: center;
-      gap: 0;
-    }
-
-    .label-utxo {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      color: var(--text-secondary);
-      margin-left: 8px;
-    }
-
-    .label-text {
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-primary);
-      margin-left: 12px;
-      flex: 1;
-    }
-
-    .tag-pill {
-      border-radius: 10px;
-      padding: 2px 8px;
-      font-size: 12px;
-      font-weight: 500;
-    }
-
-    .tag-pill.tainted { background: var(--red-light);   color: var(--red); }
-    .tag-pill.coinjoin,
-    .tag-pill.clean   { background: var(--green-light); color: var(--green); }
-    .tag-pill.unknown { background: var(--slate-light); color: var(--slate); }
-
-    .label-taint-warning {
-      font-size: 12px;
-      font-weight: 400;
-      color: var(--text-secondary);
-      margin-top: 4px;
-    }
-
-    /* ── What to do next ────────────────────────────────────── */
-    .next-card {
-      margin-top: 24px;
-      background: var(--orange-light);
-      border-left: 3px solid var(--orange);
-      border-radius: 8px;
-      padding: 16px 20px;
-    }
-
-    .next-card h3 {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-
-    .next-card ol {
-      margin-top: 8px;
-      padding-left: 18px;
-    }
-
-    .next-card ol li {
-      font-size: 13px;
-      font-weight: 400;
-      color: var(--text-secondary);
-      line-height: 1.7;
-    }
-
-    /* ── Download button ────────────────────────────────────── */
-    .btn-download {
-      margin-top: 16px;
-      padding: 10px 20px;
-      background: #fff;
-      border: 1px solid var(--orange);
-      color: var(--orange);
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background 150ms;
-    }
-
-    .btn-download:hover { background: var(--orange-light); }
-
-    /* ── Responsive ─────────────────────────────────────────── */
-    @media (max-width: 560px) {
-      .score-card { flex-direction: column; gap: 24px; }
-      .score-left { width: auto; }
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
@@ -558,7 +15,6 @@
 <header>
   <a class="wordmark" href="#">
     <div class="wordmark-icon">
-      <!-- lock icon -->
       <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
         <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
@@ -569,6 +25,7 @@
   <nav class="nav-links">
     <a href="https://github.com/bitcoin/bips" target="_blank" rel="noopener">Docs</a>
     <a href="https://github.com/" target="_blank" rel="noopener">GitHub</a>
+    <a href="#" id="learn-link">Learn</a>
   </nav>
 </header>
 
@@ -578,7 +35,7 @@
   <!-- Input zone -->
   <section class="input-zone">
     <h1>Check your transaction</h1>
-    <p class="subtitle">Paste a PSBT, raw transaction hex, or txid. Your data never leaves your browser.</p>
+    <p class="subtitle" id="privacy-caption"></p>
 
     <div class="pill-tabs">
       <button class="pill active" data-tab="psbt">PSBT</button>
@@ -589,14 +46,11 @@
     <textarea id="tx-input" spellcheck="false"
       placeholder="cHNidP8BAH0CAAAAAbxLLf9+AYfqfF69QAQuETnL..."></textarea>
 
-    <div class="error-banner" id="error-banner">
-      Please paste a PSBT, raw transaction hex, or txid before analysing.
-    </div>
+    <div class="error-banner" id="error-banner"></div>
 
     <button class="btn-analyse" id="btn-analyse">Analyse Transaction</button>
 
     <button class="import-labels" id="import-labels-btn">
-      <!-- tag icon -->
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
         <line x1="7" y1="7" x2="7.01" y2="7"/>
@@ -604,6 +58,14 @@
       Import labels from Sparrow Wallet
     </button>
     <input type="file" id="file-input" accept=".json,.jsonl" />
+    <input type="file" id="file-input" accept=".json" />
+
+    <label class="network-toggle">
+      <input type="checkbox" id="network-checks" checked />
+      <span>Enable network checks
+        <span class="network-toggle-detail">(H3: address reuse, H4: UTXO age — queries mempool.space)</span>
+      </span>
+    </label>
   </section>
 
   <!-- Results zone -->
@@ -617,7 +79,7 @@
         <div class="verdict-pill" id="verdict-pill"></div>
       </div>
       <div class="score-right">
-        <div class="gauge-wrap" id="gauge-wrap">
+        <div class="gauge-wrap">
           <div class="gauge-bar">
             <div class="gauge-seg-red"></div>
             <div class="gauge-seg-amber"></div>
@@ -630,7 +92,7 @@
     </div>
 
     <!-- Findings -->
-    <div class="findings-section" id="findings-section">
+    <div class="findings-section">
       <div class="section-head">
         <h2>Findings</h2>
         <span class="count-badge" id="findings-count"></span>
@@ -639,7 +101,7 @@
     </div>
 
     <!-- Checks -->
-    <div class="checks-section" id="checks-section">
+    <div class="checks-section">
       <div class="section-head">
         <h2>Checks</h2>
         <span class="count-badge" id="checks-count"></span>
@@ -656,7 +118,7 @@
     </div>
 
     <!-- What to do next -->
-    <div class="next-card" id="next-card">
+    <div class="next-card">
       <h3>What to do next</h3>
       <ol id="next-list"></ol>
     </div>
@@ -1100,38 +562,32 @@
       txt += `\n`;
     }
     txt += '\n';
+<!-- ── Glossary overlay + panel ─────────────────────────────── -->
+<div class="glossary-backdrop" id="glossary-backdrop"></div>
 
-    if (r.labels && r.labels.length > 0) {
-      txt += `COIN LABELS\n-----------\n`;
-      for (const l of r.labels) {
-        const sid = l.short_id || shortId(l.txid, l.vout);
-        txt += `${sid}  ${l.label}  [${l.tag}]\n`;
-      }
-      txt += '\n';
-    }
+<aside class="glossary-panel" id="glossary-panel" aria-label="Bitcoin privacy glossary">
+  <div class="glossary-header">
+    <div>
+      <div class="glossary-title">Bitcoin privacy glossary</div>
+      <div class="glossary-subtitle">Terms used in SiriScore explained plainly.</div>
+    </div>
+    <button class="glossary-close" id="glossary-close" aria-label="Close glossary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
 
-    txt += `WHAT TO DO NEXT\n---------------\n`;
-    const ordered = reportFindings.slice(0, 3);
-    ordered.forEach((f, i) => { txt += `${i + 1}. ${f.suggestion}\n`; });
-    if (ordered.length === 0) txt += `No immediate action needed.\n`;
+  <input class="glossary-search" id="glossary-search" type="text"
+         placeholder="Search terms..." autocomplete="off" spellcheck="false" />
 
-    const blob = new Blob([txt], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'siriscore-report.txt';
-    a.click();
-    URL.revokeObjectURL(url);
-  });
+  <div class="glossary-list" id="glossary-list"></div>
 
-  // ── Util ──────────────────────────────────────────────────
-  function escHtml(str) {
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
-</script>
+  <div class="glossary-empty" id="glossary-empty" style="display:none">
+    No terms match your search.
+  </div>
+</aside>
+
+<script src="app.js"></script>
 </body>
 </html>
