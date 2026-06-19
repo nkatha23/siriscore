@@ -87,7 +87,7 @@ def score_tx(req: ScoreRequest):
             }
             for c in report.checks
         ],
-        "labels": get_all_labels(),
+        "labels": report.labels,
     }
 
 
@@ -101,6 +101,14 @@ async def import_labels_endpoint(file: UploadFile = File(...)):
         n = import_labels(tmp_path)
     finally:
         os.unlink(tmp_path)
+    if n == 0:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "No labels were imported. Expected Sparrow/BIP329 JSONL records "
+                "or legacy {'txid:vout': 'label'} JSON."
+            ),
+        )
     return {"imported": n}
 
 
