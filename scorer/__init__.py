@@ -4,7 +4,6 @@ from scorer.parser import parse_as
 from scorer.report import Report, Finding, Severity, Check
 from scorer.labels import init_db, import_sparrow
 from scorer.labels import get_input_label
-from scorer.heuristics import ALL as _HEURISTICS
 from scorer.heuristics import LOCAL as _LOCAL, NETWORK as _NETWORK
 from scorer.heuristics.h1_script_mismatch import classify_script
 
