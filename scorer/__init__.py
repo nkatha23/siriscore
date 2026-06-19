@@ -83,7 +83,6 @@ def _score_parsed(tx, psbt_meta, lookup: bool = False, backend=None) -> Report:
 
     tainted = any(f.heuristic_id == "H8" for f in findings)
     final_score = min(raw_score, _H8_SCORE_CAP) if tainted else raw_score
-    checks = _build_checks(tx, findings)
     labels = _input_labels(tx)
     checks = _build_checks(tx, findings, lookup, backend)
 

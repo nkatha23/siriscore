@@ -58,7 +58,6 @@
       Import labels from Sparrow Wallet
     </button>
     <input type="file" id="file-input" accept=".json,.jsonl" />
-    <input type="file" id="file-input" accept=".json" />
 
     <label class="network-toggle">
       <input type="checkbox" id="network-checks" checked />
@@ -129,7 +128,7 @@
   </section>
 </div>
 
-<script>
+<script type="text/plain" id="legacy-inline-script">
   // ── Mock data ─────────────────────────────────────────────
   const MOCK_RESULT = {
     score: 34,
@@ -562,6 +561,7 @@
       txt += `\n`;
     }
     txt += '\n';
+</script>
 <!-- ── Glossary overlay + panel ─────────────────────────────── -->
 <div class="glossary-backdrop" id="glossary-backdrop"></div>
 
