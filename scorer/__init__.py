@@ -3,6 +3,7 @@ from scorer.parser import parse
 from scorer.parser import parse_as
 from scorer.report import Report, Finding, Severity, Check
 from scorer.labels import init_db, import_sparrow
+from scorer.labels import get_input_label
 from scorer.heuristics import LOCAL as _LOCAL, NETWORK as _NETWORK
 from scorer.heuristics.h1_script_mismatch import classify_script
 
@@ -81,6 +82,7 @@ def _score_parsed(tx, psbt_meta, lookup: bool = False, backend=None) -> Report:
 
     tainted = any(f.heuristic_id == "H8" for f in findings)
     final_score = min(raw_score, _H8_SCORE_CAP) if tainted else raw_score
+    labels = _input_labels(tx)
     checks = _build_checks(tx, findings, lookup, backend)
 
     return Report(
@@ -90,6 +92,7 @@ def _score_parsed(tx, psbt_meta, lookup: bool = False, backend=None) -> Report:
         input_count=len(tx.inputs),
         output_count=len(tx.outputs),
         psbt_version=psbt_meta.get("version", 0),
+        labels=labels,
     )
 
 
@@ -152,3 +155,21 @@ def _unavailable_reason(heuristic_id: str, tx) -> str:
         return "Input values unavailable"
 
     return ""
+
+
+def _input_labels(tx) -> list[dict]:
+    labels = []
+    seen = set()
+    for txin in tx.inputs:
+        record = get_input_label(txin.txid, txin.vout, txin.address)
+        if record is None:
+            continue
+        key = (record.get("label_type"), record.get("ref"), record.get("txid"), record.get("vout"), record.get("address"))
+        if key in seen:
+            continue
+        seen.add(key)
+        enriched = dict(record)
+        enriched["in_inputs"] = True
+        enriched["matched_input"] = f"{txin.txid}:{txin.vout}"
+        labels.append(enriched)
+    return labels
