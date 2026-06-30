@@ -21,6 +21,7 @@ _HEURISTIC_DEFS = [
     ("H8",  Severity.CRITICAL, "Labelled tainted UTXO in inputs"),
     ("H9",  Severity.INFO,     "Input is a coinjoin output"),
     ("H10", Severity.INFO,     "Transaction is a coinjoin"),
+    ("H11", Severity.INFO,     "Payjoin opportunity available"),
 ]
 
 _NETWORK_IDS = {"H3", "H4"}

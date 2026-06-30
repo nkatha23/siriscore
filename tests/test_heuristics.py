@@ -311,7 +311,7 @@ class TestCoinJoinH5Suppression:
             mock_h10.return_value = None
             mock_h5.return_value = Finding("H5", Severity.WARNING, "High inputs", "d", "s", 10)
 
-            from scorer.parser import ParsedTx, TxInput, TxOutput
+            from scorer.parser import ParsedTx, TxInput
             tx = ParsedTx(version=2, inputs=[TxInput("a"*64, 0, b"", 0xffffffff)], outputs=[], locktime=0)
 
             report = scorer._score_parsed(tx, {"version": 0})
@@ -339,3 +339,61 @@ class TestCoinJoinH5Suppression:
             # Score should be 100 (all heuristics pass) + bonus capped at 100
             assert report.score == 100
             assert any(f.heuristic_id == "H10" for f in report.findings)
+
+
+class TestH11PayjoinOpportunity:
+    _BTCPAY_URI = (
+        "bitcoin:BC1QYLH3U67J673H6Y6ALV70M0PL2YZ53TZHVXGG7U"
+        "?amount=0.00001"
+        "&pj=https://btcpay.example.com/api/v1/invoices/abc123/payjoin"
+    )
+
+    def test_fires_on_bip21_uri_with_pj_param(self):
+        from scorer.heuristics.h11_payjoin_opportunity import check
+
+        finding = check(_tx(), {"payment_uri": self._BTCPAY_URI})
+
+        assert finding is not None
+        assert finding.heuristic_id == "H11"
+        assert finding.weight == 0
+        assert finding.positive is True
+        assert finding.severity.value == "info"
+
+    def test_does_not_fire_without_uri(self):
+        from scorer.heuristics.h11_payjoin_opportunity import check
+
+        assert check(_tx(), {}) is None
+
+    def test_does_not_fire_when_pj_absent_from_uri(self):
+        from scorer.heuristics.h11_payjoin_opportunity import check
+
+        uri = "bitcoin:BC1QYLH3U67J673H6Y6ALV70M0PL2YZ53TZHVXGG7U?amount=0.001"
+        assert check(_tx(), {"payment_uri": uri}) is None
+
+    def test_escalates_to_warning_when_h5_fires(self):
+        from scorer.heuristics.h11_payjoin_opportunity import check
+
+        inputs = [MagicMock() for _ in range(6)]
+        finding = check(_tx(inputs=inputs), {"payment_uri": self._BTCPAY_URI})
+
+        assert finding is not None
+        assert finding.severity.value == "warning"
+        assert "H5" in finding.title or "H5" in finding.detail
+
+    def test_bip21_uri_key_alias(self):
+        from scorer.heuristics.h11_payjoin_opportunity import check
+
+        finding = check(_tx(), {"bip21_uri": self._BTCPAY_URI})
+        assert finding is not None
+        assert finding.heuristic_id == "H11"
+
+    def test_extract_pj_endpoint(self):
+        from scorer.heuristics.h11_payjoin_opportunity import _extract_pj_endpoint
+
+        url = _extract_pj_endpoint(self._BTCPAY_URI)
+        assert url == "https://btcpay.example.com/api/v1/invoices/abc123/payjoin"
+
+    def test_extract_returns_none_for_plain_address(self):
+        from scorer.heuristics.h11_payjoin_opportunity import _extract_pj_endpoint
+
+        assert _extract_pj_endpoint("bitcoin:BC1QYLH3U67J673H6Y6ALV70M0PL2YZ53TZHVXGG7U") is None
