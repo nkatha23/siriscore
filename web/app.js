@@ -549,6 +549,11 @@ document.getElementById('learn-link').addEventListener('click', e => {
   openGlossary();
 });
 
+document.getElementById('learn-link-footer').addEventListener('click', e => {
+  e.preventDefault();
+  openGlossary();
+});
+
 document.getElementById('glossary-close').addEventListener('click', closeGlossary);
 glossaryBackdrop.addEventListener('click', closeGlossary);
 
