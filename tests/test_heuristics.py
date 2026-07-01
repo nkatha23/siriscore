@@ -455,3 +455,48 @@ class TestH11PayjoinOpportunity:
         from scorer.heuristics.h11_payjoin_opportunity import _extract_pj_endpoint
 
         assert _extract_pj_endpoint("bitcoin:BC1QYLH3U67J673H6Y6ALV70M0PL2YZ53TZHVXGG7U") is None
+
+
+class TestH13NLocktime:
+    def test_fires_on_locktime_zero(self):
+        from scorer.heuristics.h13_nlocktime import check
+
+        tx = _tx()
+        tx.locktime = 0
+        finding = check(tx, {})
+
+        assert finding is not None
+        assert finding.heuristic_id == "H13"
+        assert finding.severity == Severity.INFO
+        assert finding.weight == 5
+
+    def test_passes_on_plausible_block_height(self):
+        from scorer.heuristics.h13_nlocktime import check
+
+        tx = _tx()
+        tx.locktime = 850_000
+        assert check(tx, {}) is None
+
+    def test_passes_on_locktime_one(self):
+        from scorer.heuristics.h13_nlocktime import check
+
+        tx = _tx()
+        tx.locktime = 1
+        assert check(tx, {}) is None
+
+    def test_score_deduction_is_exactly_five(self):
+        import scorer
+        from unittest.mock import patch
+        from scorer.report import Finding, Severity as Sev
+        from scorer.parser import ParsedTx, TxInput
+
+        with patch("scorer.heuristics.h13_nlocktime.check") as mock_h13:
+            mock_h13.return_value = Finding("H13", Sev.INFO, "nLockTime", "d", "s", 5)
+
+            # All other heuristics pass — use locktime=0 to trigger real H13, but
+            # here we mock it directly and use a minimal tx with locktime=1 so nothing
+            # else fires.
+            tx = ParsedTx(version=2, inputs=[TxInput("a" * 64, 0, b"", 0xFFFFFFFF)], outputs=[], locktime=1)
+            report = scorer._score_parsed(tx, {"version": 0})
+
+        assert report.score == 95
