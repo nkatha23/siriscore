@@ -1,17 +1,7 @@
 """H12 — Silent Payments recommendation (BIP-352), fires when H3 fires."""
-from scorer.lookup import get_address_txs
 from scorer.parser import script_to_address
 from scorer.report import Finding, Severity
 from scorer.utils import is_silent_payment_address
-
-MAX_ADDRESS_LOOKUPS = 5
-
-
-def _address_is_reused(address: str, get_fn) -> bool:
-    try:
-        return len(get_fn(address)) > 1
-    except Exception:  # noqa: BLE001
-        return False
 
 
 def _output_supports_sp(tx) -> bool:
@@ -23,21 +13,7 @@ def _output_supports_sp(tx) -> bool:
 
 
 def check(tx, psbt_meta) -> Finding | None:
-    backend = psbt_meta.get("_backend")
-    _get = backend.get_address_txs if backend else get_address_txs
-
-    reuse_found = False
-    checked = 0
-    for inp in tx.inputs:
-        address = inp.address
-        if not address or checked >= MAX_ADDRESS_LOOKUPS:
-            continue
-        checked += 1
-        if _address_is_reused(address, _get):
-            reuse_found = True
-            break
-
-    if not reuse_found:
+    if not psbt_meta.get("_h3_fired"):
         return None
 
     if _output_supports_sp(tx):

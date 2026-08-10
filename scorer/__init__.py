@@ -137,6 +137,8 @@ def _score_parsed(tx, psbt_meta, lookup: bool = False, backend=None) -> Report:
         result = module.check(tx, meta)
         if result is not None:
             findings.append(result)
+            if result.heuristic_id == "H3":
+                meta["_h3_fired"] = True
 
     # Suppress H5 when a coinjoin heuristic fires (H9 or H10) — not a false positive
     coinjoin_fired = any(f.heuristic_id in _COINJOIN_SUPPRESSORS for f in findings)
